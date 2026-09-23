@@ -1,14 +1,32 @@
+use bitflags::bitflags;
 use sdl3::pixels::PixelFormat;
-use sdl3::render::{ScaleMode, Texture, WindowCanvas};
-use crate::renderer::palette::Palette;
+use sdl3::render::{ScaleMode, WindowCanvas};
+use crate::math::{Point, Rect};
+use crate::renderer::palette::{Colors, Palette};
 use crate::renderer::pixel_buffer::PixelBuffer;
+use crate::renderer::texture::Texture;
 
 pub mod pixel_buffer;
 pub mod palette;
+pub mod texture;
+
+bitflags! {
+    pub struct BlitFlags: u8 {
+        const FLIP_H = 1 << 0;
+        const FLIP_V = 1 << 1;
+    }
+}
+
+pub struct BlitDesc<'a> {
+    pub src: &'a Rect<u32>,
+    pub dst: &'a Point<u32>,
+    pub colors: &'a Colors,
+    pub blit_flags: &'a BlitFlags,
+}
 
 pub struct Renderer {
     canvas: WindowCanvas,
-    screen: Texture,
+    screen: sdl3::render::Texture,
     pixel_buffer: PixelBuffer,
     palette: Palette,
 }
@@ -36,6 +54,20 @@ impl Renderer {
         for y in 0..PixelBuffer::HEIGHT {
             for x in 0..PixelBuffer::WIDTH {
                 self.pixel_buffer.set_pixel(x as usize, y as usize, self.palette[((y + x) % 216) as usize]);
+            }
+        }
+    }
+
+    pub fn blit_texture(&mut self, texture: &Texture, blit_desc: BlitDesc) {
+        for y in 0..texture.height() {
+            for x in 0..texture.width() {
+                let pixel = texture.pixel_at(x as usize, y as usize) as usize;
+
+                if pixel == Texture::TRANSPARENT_PIXEL as usize {
+                    continue
+                }
+
+                self.pixel_buffer.set_pixel(x as usize, y as usize, self.palette[blit_desc.colors[pixel].unwrap()]);
             }
         }
     }
