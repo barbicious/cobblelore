@@ -1,9 +1,11 @@
 use sdl3::event::Event;
 use sdl3::{EventPump, Sdl};
+use crate::level::tile_registry::TileRegistry;
 use crate::math::{Point, Rect};
 use crate::renderer::{BlitDesc, BlitFlags, Renderer};
 use crate::renderer::palette::Palette;
 use crate::renderer::texture::Texture;
+use crate::renderer::texture_registry::TextureRegistry;
 
 pub struct State {
     event_pump: EventPump,
@@ -23,7 +25,8 @@ impl State {
     }
 
     pub fn run(mut self) -> anyhow::Result<()> {
-        let texture = Texture::new("res/textures/ground.png")?;
+        let texture_registry = TextureRegistry::new()?;
+        let tile_registry = TileRegistry::new(&texture_registry)?;
 
         'running: loop {
             for event in self.event_pump.poll_iter() {
@@ -35,27 +38,11 @@ impl State {
 
             self.renderer.flush();
 
-            self.renderer.blit_palette();
-
-            self.renderer.blit_texture(&texture, BlitDesc {
-                src: &Rect {
-                    x: 0,
-                    y: 0,
-                    w: 16,
-                    h: 24
-                },
-                dst: &Point {
-                    x: 0,
-                    y: 0,
-                },
-                colors: &[
-                    Some(Palette::palettize(3 , 2, 1)),
-                    Some(Palette::palettize(1 , 1, 1)),
-                    Some(Palette::palettize(5 , 2, 1)),
-                    Some(Palette::palettize(3 , 5, 1)),
-                ],
-                blit_flags: &BlitFlags::empty(),
-            });
+            for y in 0..30 {
+                for x in 0..30 {
+                    tile_registry[0].blit(&mut self.renderer, &texture_registry, x * 24, y * 24);
+                }
+            }
 
             self.renderer.splat()?;
         }

@@ -1,0 +1,10 @@
+(
+    name: "cobblelore::grass",
+    colors: (
+        Some((r: 3, g: 2, b: 1)),
+        Some((r: 1, g: 3, b: 1)),
+        Some((r: 1, g: 4, b: 1)),
+        Some((r: 2, g: 5, b: 2)),
+    ),
+    texture_name: "ground",
+)

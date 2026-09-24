@@ -9,6 +9,9 @@ use crate::renderer::texture::Texture;
 pub mod pixel_buffer;
 pub mod palette;
 pub mod texture;
+pub mod camera;
+pub mod texture_registry;
+pub mod color;
 
 bitflags! {
     pub struct BlitFlags: u8 {
@@ -19,7 +22,7 @@ bitflags! {
 
 pub struct BlitDesc<'a> {
     pub src: &'a Rect<u32>,
-    pub dst: &'a Point<u32>,
+    pub dst: &'a Point<i32>,
     pub colors: &'a Colors,
     pub blit_flags: &'a BlitFlags,
 }
@@ -50,24 +53,28 @@ impl Renderer {
         })
     }
 
-    pub fn blit_palette(&mut self) {
-        for y in 0..PixelBuffer::HEIGHT {
-            for x in 0..PixelBuffer::WIDTH {
-                self.pixel_buffer.set_pixel(x as usize, y as usize, self.palette[((y + x) % 216) as usize]);
-            }
-        }
-    }
-
     pub fn blit_texture(&mut self, texture: &Texture, blit_desc: BlitDesc) {
-        for y in 0..texture.height() {
-            for x in 0..texture.width() {
-                let pixel = texture.pixel_at(x as usize, y as usize) as usize;
+        for y in 0..blit_desc.src.h {
+            let y_dst = if !blit_desc.blit_flags.contains(BlitFlags::FLIP_V) { y as i32 + blit_desc.dst.y } else { blit_desc.dst.y + blit_desc.src.h as i32 - y as i32 - 1 };
+
+            if y_dst < 0 || y_dst >= PixelBuffer::HEIGHT as i32 {
+                continue
+            }
+
+            for x in 0..blit_desc.src.w {
+                let x_dst = if !blit_desc.blit_flags.contains(BlitFlags::FLIP_H) { x as i32 + blit_desc.dst.x } else { blit_desc.dst.x + blit_desc.src.w as i32 - x as i32 - 1 };
+
+                if x_dst < 0 || x_dst >= PixelBuffer::WIDTH as i32 {
+                    continue
+                }
+
+                let pixel = texture.pixel_at((x + blit_desc.src.x) as usize, (y + blit_desc.src.y) as usize) as usize;
 
                 if pixel == Texture::TRANSPARENT_PIXEL as usize {
                     continue
                 }
 
-                self.pixel_buffer.set_pixel(x as usize, y as usize, self.palette[blit_desc.colors[pixel].unwrap()]);
+                self.pixel_buffer.set_pixel(x_dst as usize, y_dst as usize, self.palette[blit_desc.colors[pixel].unwrap()]);
             }
         }
     }

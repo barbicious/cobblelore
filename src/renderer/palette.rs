@@ -11,7 +11,7 @@ macro_rules! apply_palette {
     }};
 }
 
-const MAX_COLORS: usize = 4;
+pub const MAX_COLORS: usize = 4;
 
 pub type Colors = [Option<usize>; MAX_COLORS];
 

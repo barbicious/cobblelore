@@ -1,8 +1,12 @@
+use crate::renderer::texture_registry::TextureRegistry;
 use crate::state::State;
 
 mod state;
-pub mod renderer;
+mod renderer;
 mod math;
+mod level;
+mod registry;
+mod object_name;
 
 fn main() -> anyhow::Result<()> {
     let state = State::new()?;
