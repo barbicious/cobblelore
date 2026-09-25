@@ -24,9 +24,11 @@ impl TileRegistry {
 
                     let object_name = ObjectName::new(&tile_payload.name);
 
-                    names.insert(object_name, names.len());
+                    let id = tiles.len();
 
-                    tiles.push(Tile::new(tile_payload, texture_registry));
+                    names.insert(object_name, id);
+
+                    tiles.push(Tile::new(tile_payload, texture_registry, id));
                 }
             }
         }

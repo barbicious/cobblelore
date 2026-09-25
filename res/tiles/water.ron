@@ -1,0 +1,12 @@
+(
+    name: "cobblelore::water",
+    colors: (
+        Some((r: 4, g: 3, b: 2)),
+        Some((r: 3, g: 2, b: 1)),
+        Some((r: 1, g: 1, b: 4)),
+        Some((r: 2, g: 2, b: 5)),
+    ),
+    texture_name: "liquid",
+    neighbor_check: Four,
+    liquid: true,
+)

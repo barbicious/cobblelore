@@ -12,3 +12,4 @@ image = { version = "0.25.10", features = ["png"] }
 bitflags = "2.13.2"
 serde = { version = "1.0.229", features = ["derive"] }
 ron = "0.12.2"
+rand = "0.10.3"
