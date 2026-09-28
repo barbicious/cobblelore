@@ -11,8 +11,8 @@ pub struct Level {
 }
 
 impl Level {
-    pub const WIDTH: usize = 64;
-    pub const HEIGHT: usize = 32;
+    pub const WIDTH: usize = 20;
+    pub const HEIGHT: usize = 20;
 
     pub fn new() -> Self {
         let mut tiles = [0; Self::WIDTH * Self::HEIGHT];

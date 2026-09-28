@@ -5,6 +5,7 @@ use crate::renderer::texture::Texture;
 use bitflags::bitflags;
 use sdl3::pixels::PixelFormat;
 use sdl3::render::{ScaleMode, WindowCanvas};
+use crate::renderer::camera::Camera;
 
 pub mod pixel_buffer;
 pub mod palette;
@@ -32,10 +33,11 @@ pub struct Renderer {
     screen: sdl3::render::Texture,
     pixel_buffer: PixelBuffer,
     palette: Palette,
+    camera: Camera,
 }
 
 impl Renderer {
-    pub fn new(canvas: WindowCanvas) -> anyhow::Result<Self> {
+    pub fn new(canvas: WindowCanvas, camera: Camera) -> anyhow::Result<Self> {
         let mut screen = canvas.texture_creator()
             .create_texture_streaming(
                 Some(PixelFormat::ARGB8888),
@@ -50,19 +52,20 @@ impl Renderer {
             screen,
             pixel_buffer: PixelBuffer::new(),
             palette: Palette::new(),
+            camera,
         })
     }
 
     pub fn blit_texture(&mut self, texture: &Texture, blit_desc: BlitDesc) {
         for y in 0..blit_desc.src.h {
-            let y_dst = if !blit_desc.blit_flags.contains(BlitFlags::FLIP_V) { y as i32 + blit_desc.dst.y } else { blit_desc.dst.y + blit_desc.src.h as i32 - y as i32 - 1 };
+            let y_dst = if !blit_desc.blit_flags.contains(BlitFlags::FLIP_V) { y as i32 + blit_desc.dst.y - self.camera.y_offset() } else { blit_desc.dst.y + blit_desc.src.h as i32 - y as i32 - 1 - self.camera.y_offset() };
 
             if y_dst < 0 || y_dst >= PixelBuffer::HEIGHT as i32 {
                 continue
             }
 
             for x in 0..blit_desc.src.w {
-                let x_dst = if !blit_desc.blit_flags.contains(BlitFlags::FLIP_H) { x as i32 + blit_desc.dst.x } else { blit_desc.dst.x + blit_desc.src.w as i32 - x as i32 - 1 };
+                let x_dst = if !blit_desc.blit_flags.contains(BlitFlags::FLIP_H) { x as i32 + blit_desc.dst.x - self.camera.x_offset() } else { blit_desc.dst.x + blit_desc.src.w as i32 - x as i32 - 1 - self.camera.x_offset() };
 
                 if x_dst < 0 || x_dst >= PixelBuffer::WIDTH as i32 {
                     continue
@@ -95,5 +98,9 @@ impl Renderer {
         self.canvas.present();
 
         Ok(())
+    }
+    
+    pub fn camera_mut(&mut self) -> &mut Camera {
+        &mut self.camera
     }
 }
