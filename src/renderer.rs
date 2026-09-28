@@ -1,10 +1,10 @@
-use bitflags::bitflags;
-use sdl3::pixels::PixelFormat;
-use sdl3::render::{ScaleMode, WindowCanvas};
 use crate::math::{Point, Rect};
 use crate::renderer::palette::{Colors, Palette};
 use crate::renderer::pixel_buffer::PixelBuffer;
 use crate::renderer::texture::Texture;
+use bitflags::bitflags;
+use sdl3::pixels::PixelFormat;
+use sdl3::render::{ScaleMode, WindowCanvas};
 
 pub mod pixel_buffer;
 pub mod palette;

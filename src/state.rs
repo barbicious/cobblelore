@@ -1,13 +1,13 @@
-use std::time::Instant;
-use sdl3::event::Event;
-use sdl3::{EventPump, Sdl};
 use crate::level::Level;
 use crate::level::tile_registry::TileRegistry;
-use crate::math::{Point, Rect};
-use crate::renderer::{BlitDesc, BlitFlags, Renderer};
-use crate::renderer::palette::Palette;
-use crate::renderer::texture::Texture;
 use crate::renderer::texture_registry::TextureRegistry;
+use crate::renderer::Renderer;
+use sdl3::event::Event;
+use sdl3::EventPump;
+use std::time::Instant;
+use log::__private_api::Key;
+use sdl3::keyboard::Scancode;
+use crate::keyboard::Keyboard;
 
 const FIXED_DT: f32 = 1.0 / 60.0;
 
@@ -16,6 +16,7 @@ pub struct State {
     renderer: Renderer,
     level: Level,
     ticks: u32,
+    keyboard: Keyboard,
 }
 
 impl State {
@@ -26,8 +27,9 @@ impl State {
         let window = video.window(format!("cobblelore: v{}", env!("CARGO_PKG_VERSION")).as_str(), 1280, 720).position_centered().build()?;
         let event_pump = sdl_context.event_pump()?;
         let canvas = window.into_canvas();
+        let keyboard = Keyboard::new(&event_pump);
 
-        Ok(Self { event_pump, renderer: Renderer::new(canvas)?, level: Level::new(), ticks: 0 })
+        Ok(Self { event_pump, renderer: Renderer::new(canvas)?, level: Level::new(), ticks: 0, keyboard })
     }
 
     pub fn run(mut self) -> anyhow::Result<()> {
@@ -54,6 +56,8 @@ impl State {
 
             while accumulator >= FIXED_DT {
                 self.ticks += 1;
+
+                self.keyboard.tick(&self.event_pump);
 
                 accumulator -= FIXED_DT;
             }

@@ -1,15 +1,14 @@
-use std::sync::LazyLock;
-use bitflags::bitflags;
-use rand::rngs::StdRng;
-use rand::{RngExt, SeedableRng};
 use crate::level::Level;
 use crate::level::tile_registry::TileRegistry;
 use crate::math::{Point, Rect};
-use crate::renderer::palette::{Colors, MAX_COLORS};
-use crate::renderer::{BlitDesc, BlitFlags, Renderer};
 use crate::renderer::color::Color;
+use crate::renderer::palette::{Colors, MAX_COLORS};
 use crate::renderer::texture_registry::TextureRegistry;
+use crate::renderer::{BlitDesc, BlitFlags, Renderer};
 use crate::unpack_colors;
+use bitflags::bitflags;
+use rand::rngs::StdRng;
+use rand::{RngExt, SeedableRng};
 
 bitflags! {
     pub struct NeighborMask: u8 {

@@ -1,11 +1,8 @@
-use std::collections::HashMap;
-use std::ops::Index;
-use std::path::Path;
 use crate::level::tile::{Tile, TilePayload};
 use crate::object_name::ObjectName;
-use crate::registry::Registry;
-use crate::renderer::texture::Texture;
 use crate::renderer::texture_registry::TextureRegistry;
+use std::collections::HashMap;
+use std::ops::Index;
 
 pub struct TileRegistry {
     tiles: Vec<Tile>,

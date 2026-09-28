@@ -1,8 +1,6 @@
+use crate::renderer::texture::Texture;
 use std::collections::HashMap;
 use std::ops::Index;
-use std::path::Path;
-use crate::registry::Registry;
-use crate::renderer::texture::Texture;
 
 pub struct TextureRegistry {
     textures: Vec<Texture>,

@@ -27,7 +27,6 @@ impl PixelBuffer {
         self.pixels.fill(0);
     }
 
-    /// Returns byte representation of pixels for uploading to a given image for display
     pub fn bytes(&self) -> &[u8] {
         &self.pixels
     }
