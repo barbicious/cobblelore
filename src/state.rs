@@ -1,4 +1,4 @@
-use crate::components::{PlayerComponent, PositionComponent, SpriteComponent};
+use crate::components::{PlayerComponent, PositionComponent, SpriteComponent, VelocityComponent};
 use crate::keyboard::Keyboard;
 use crate::level::Level;
 use crate::level::tile::Tile;
@@ -97,6 +97,7 @@ impl State {
                 texture_id: self.texture_registry["player"],
                 flags: BlitFlags::empty(),
             },
+            VelocityComponent { x: 0, y: 0 }
         ));
 
         'running: loop {
@@ -121,27 +122,58 @@ impl State {
 
                 self.keyboard.tick(&self.event_pump);
 
-                for (pos, _) in &mut self
+                for vel in &mut self.world.query::<&mut VelocityComponent>() {
+                    vel.x = 0;
+                    vel.y = 0;
+                }
+
+                for (vel, _) in &mut self
                     .world
-                    .query::<(&mut PositionComponent, &PlayerComponent)>()
+                    .query::<(&mut VelocityComponent, &PlayerComponent)>()
                 {
                     if self.keyboard.is_key_down(Scancode::A) {
-                        pos.x -= 1
+                        vel.x = -1
                     }
 
                     if self.keyboard.is_key_down(Scancode::D) {
-                        pos.x += 1
+                        vel.x += 1
                     }
 
-                    self.renderer.camera_mut().set_x_offset(pos.x + 8);
-
                     if self.keyboard.is_key_down(Scancode::W) {
-                        pos.y -= 1
+                        vel.y = -1
                     }
 
                     if self.keyboard.is_key_down(Scancode::S) {
-                        pos.y += 1
+                        vel.y += 1
                     }
+                }
+
+                for (vel, pos) in &mut self.world.query::<(&VelocityComponent, &mut PositionComponent)>() {
+                    pos.x += vel.x;
+
+                    pos.x = pos.x.clamp(0, Level::WIDTH as i32 * Tile::WIDTH - 16);
+
+                    if self.level.is_tile_solid(&self.tile_registry, pos.x as usize / 16, pos.y as usize / 16) ||
+                        self.level.is_tile_solid(&self.tile_registry, (pos.x + 15) as usize / 16, pos.y as usize / 16) ||
+                        self.level.is_tile_solid(&self.tile_registry, pos.x as usize / 16, (pos.y + 15) as usize / 16) ||
+                        self.level.is_tile_solid(&self.tile_registry, (pos.x + 15) as usize / 16, (pos.y + 15) as usize / 16) {
+                        pos.x -= vel.x;
+                    }
+
+                    pos.y += vel.y;
+
+                    pos.y = pos.y.clamp(0, Level::HEIGHT as i32 * Tile::HEIGHT - 16);
+
+                    if self.level.is_tile_solid(&self.tile_registry, pos.x as usize / 16, pos.y as usize / 16) ||
+                        self.level.is_tile_solid(&self.tile_registry, (pos.x + 15) as usize / 16, pos.y as usize / 16) ||
+                        self.level.is_tile_solid(&self.tile_registry, pos.x as usize / 16, (pos.y + 15) as usize / 16) ||
+                        self.level.is_tile_solid(&self.tile_registry, (pos.x + 15) as usize / 16, (pos.y + 15) as usize / 16) {
+                        pos.y -= vel.y;
+                    }
+                }
+
+                for (pos, _) in &mut self.world.query::<(&PositionComponent, &PlayerComponent)>() {
+                    self.renderer.camera_mut().set_x_offset(pos.x + 8);
 
                     self.renderer.camera_mut().set_y_offset(pos.y + 8);
                 }

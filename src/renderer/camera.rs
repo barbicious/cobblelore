@@ -33,4 +33,8 @@ impl Camera {
         self.y_offset = (y_offset - PixelBuffer::HEIGHT as i32 / 2)
             .clamp(0, self.bounds.w - PixelBuffer::HEIGHT as i32);
     }
+
+    pub fn clamp(&self, x: i32, y: i32) -> (i32, i32) {
+        (x.clamp(0, self.bounds.w), y.clamp(0, self.bounds.h))
+    }
 }

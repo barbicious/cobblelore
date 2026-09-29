@@ -110,4 +110,9 @@ impl Level {
     const fn idx(x: usize, y: usize) -> usize {
         y * Self::WIDTH + x
     }
+
+    #[inline]
+    pub fn is_tile_solid(&self, tile_registry: &TileRegistry, x: usize, y: usize) -> bool {
+        tile_registry[self.tiles[Self::idx(x, y)]].solid()
+    }
 }

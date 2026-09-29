@@ -37,6 +37,7 @@ pub struct Tile {
     texture_id: usize,
     neighbor_check: NeighborCheck,
     liquid: bool,
+    solid: bool,
 }
 
 impl Tile {
@@ -52,6 +53,7 @@ impl Tile {
         unpack_colors!(colors, tile_payload.colors);
 
         Self {
+            solid: tile_payload.solid,
             id,
             name: tile_payload.name,
             colors,
@@ -394,6 +396,10 @@ impl Tile {
         }
     }
 
+    pub fn solid(&self) -> bool {
+        self.solid
+    }
+
     pub fn connects(&self, level: &Level, x: i32, y: i32, tile_registry: &TileRegistry) -> bool {
         if x < 0 || x >= Level::WIDTH as i32 || y < 0 || y >= Level::HEIGHT as i32 {
             return false;
@@ -448,4 +454,5 @@ pub struct TilePayload {
     pub texture_name: String,
     pub neighbor_check: NeighborCheck,
     pub liquid: bool,
+    pub solid: bool,
 }

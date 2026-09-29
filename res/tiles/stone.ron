@@ -9,4 +9,5 @@
     texture_name: "rock",
     neighbor_check: Eight,
     liquid: false,
+    solid: true,
 )

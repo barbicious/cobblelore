@@ -9,4 +9,5 @@
     texture_name: "liquid",
     neighbor_check: Four,
     liquid: true,
+    solid: false,
 )
