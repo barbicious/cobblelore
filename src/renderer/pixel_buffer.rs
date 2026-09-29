@@ -10,7 +10,9 @@ impl PixelBuffer {
     pub const CHANNELS: u32 = 4;
 
     pub fn new() -> Self {
-        Self { pixels: vec![0; Self::WIDTH as usize * Self::HEIGHT as usize * Self::CHANNELS as usize] }
+        Self {
+            pixels: vec![0; Self::WIDTH as usize * Self::HEIGHT as usize * Self::CHANNELS as usize],
+        }
     }
 
     /// Sets a pixel at the given coordinates based off of a
@@ -22,7 +24,7 @@ impl PixelBuffer {
 
         self.pixels[idx..idx + Self::CHANNELS as usize].copy_from_slice(&color.to_le_bytes());
     }
-    
+
     pub fn clear(&mut self) {
         self.pixels.fill(0);
     }

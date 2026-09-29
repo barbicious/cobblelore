@@ -1,11 +1,12 @@
 use crate::state::State;
 
-mod state;
-mod renderer;
-mod math;
-mod level;
-mod object_name;
+mod components;
 mod keyboard;
+mod level;
+mod math;
+mod object_name;
+mod renderer;
+mod state;
 
 fn main() -> anyhow::Result<()> {
     let state = State::new()?;

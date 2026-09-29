@@ -17,7 +17,8 @@ impl TileRegistry {
         for entry in std::fs::read_dir("res/tiles/")? {
             if let Ok(entry) = entry {
                 if entry.path().is_file() {
-                    let tile_payload: TilePayload = ron::from_str(&std::fs::read_to_string(entry.path())?)?;
+                    let tile_payload: TilePayload =
+                        ron::from_str(&std::fs::read_to_string(entry.path())?)?;
 
                     let object_name = ObjectName::new(&tile_payload.name);
 
@@ -30,7 +31,7 @@ impl TileRegistry {
             }
         }
 
-        Ok(Self { tiles, names})
+        Ok(Self { tiles, names })
     }
 }
 

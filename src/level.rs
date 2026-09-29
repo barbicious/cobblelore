@@ -23,10 +23,34 @@ impl Level {
             }
         }
 
+        for y in 0..3 {
+            for x in 10..15 {
+                tiles[Self::idx(x, y)] = 2;
+            }
+        }
+
+        for y in 0..6 {
+            for x in 12..14 {
+                tiles[Self::idx(x, y)] = 2;
+            }
+        }
+
+        for y in 5..8 {
+            for x in 8..17 {
+                tiles[Self::idx(x, y)] = 2;
+            }
+        }
+
         Self { tiles }
     }
 
-    pub fn blit(&self, renderer: &mut Renderer, texture_registry: &TextureRegistry, tile_registry: &TileRegistry, ticks: u32) {
+    pub fn blit(
+        &self,
+        renderer: &mut Renderer,
+        texture_registry: &TextureRegistry,
+        tile_registry: &TileRegistry,
+        ticks: u32,
+    ) {
         for y in 0..Self::HEIGHT {
             for x in 0..Self::WIDTH {
                 let mut neighbor_mask = NeighborMask::empty();
@@ -65,11 +89,18 @@ impl Level {
                     neighbor_mask.set(NeighborMask::RIGHT, true)
                 }
 
-                tile_registry[self.tiles[Self::idx(x, y)]].blit(renderer, texture_registry, x as i32 * Tile::WIDTH, y as i32 * Tile::HEIGHT, neighbor_mask, ticks);
+                tile_registry[self.tiles[Self::idx(x, y)]].blit(
+                    renderer,
+                    texture_registry,
+                    x as i32 * Tile::WIDTH,
+                    y as i32 * Tile::HEIGHT,
+                    neighbor_mask,
+                    ticks,
+                );
             }
         }
     }
-    
+
     #[inline]
     pub fn tile_at(&self, x: usize, y: usize) -> usize {
         self.tiles[Self::idx(x, y)]

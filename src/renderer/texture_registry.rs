@@ -20,16 +20,21 @@ impl TextureRegistry {
 
                     let texture = Texture::new(entry.path())?;
 
-                    names.insert(entry.path().file_stem().unwrap().to_string_lossy().to_string(), textures.len());
+                    names.insert(
+                        entry
+                            .path()
+                            .file_stem()
+                            .unwrap()
+                            .to_string_lossy()
+                            .to_string(),
+                        textures.len(),
+                    );
                     textures.push(texture);
                 }
             }
         }
 
-        Ok(Self {
-            textures,
-            names,
-        })
+        Ok(Self { textures, names })
     }
 }
 
@@ -43,7 +48,7 @@ impl Index<usize> for TextureRegistry {
 
 impl Index<&str> for TextureRegistry {
     type Output = usize;
-    
+
     fn index(&self, index: &str) -> &Self::Output {
         &self.names[index]
     }

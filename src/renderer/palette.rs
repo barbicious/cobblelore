@@ -16,7 +16,7 @@ pub const MAX_COLORS: usize = 4;
 pub type Colors = [Option<usize>; MAX_COLORS];
 
 pub struct Palette {
-    shades: [u32; Self::CHANNELS.pow(3)]
+    shades: [u32; Self::CHANNELS.pow(3)],
 }
 
 impl Palette {
@@ -58,11 +58,11 @@ impl Palette {
             (r as f32 * u8::MAX as f32 / (Palette::CHANNELS - 1) as f32) as i32,
         ) * Palette::CHANNELS.pow(2)
             + Self::color_to_palette_idx(
-            (g as f32 * u8::MAX as f32 / (Palette::CHANNELS - 1) as f32) as i32,
-        ) * Palette::CHANNELS
+                (g as f32 * u8::MAX as f32 / (Palette::CHANNELS - 1) as f32) as i32,
+            ) * Palette::CHANNELS
             + Self::color_to_palette_idx(
-            (b as f32 * u8::MAX as f32 / (Palette::CHANNELS - 1) as f32) as i32,
-        )
+                (b as f32 * u8::MAX as f32 / (Palette::CHANNELS - 1) as f32) as i32,
+            )
     }
 
     const fn color_to_palette_idx(c: i32) -> usize {

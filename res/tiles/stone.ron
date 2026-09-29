@@ -1,0 +1,12 @@
+(
+    name: "cobblelore::stone",
+    colors: (
+        Some((r: 4, g: 3, b: 2)),
+        Some((r: 2, g: 2, b: 2)),
+        Some((r: 3, g: 3, b: 3)),
+        Some((r: 4, g: 4, b: 4)),
+    ),
+    texture_name: "rock",
+    neighbor_check: Eight,
+    liquid: false,
+)

@@ -1,18 +1,18 @@
 use crate::math::{Point, Rect};
+use crate::renderer::camera::Camera;
 use crate::renderer::palette::{Colors, Palette};
 use crate::renderer::pixel_buffer::PixelBuffer;
 use crate::renderer::texture::Texture;
 use bitflags::bitflags;
 use sdl3::pixels::PixelFormat;
 use sdl3::render::{ScaleMode, WindowCanvas};
-use crate::renderer::camera::Camera;
 
-pub mod pixel_buffer;
-pub mod palette;
-pub mod texture;
 pub mod camera;
-pub mod texture_registry;
 pub mod color;
+pub mod palette;
+pub mod pixel_buffer;
+pub mod texture;
+pub mod texture_registry;
 
 bitflags! {
     pub struct BlitFlags: u8 {
@@ -38,12 +38,11 @@ pub struct Renderer {
 
 impl Renderer {
     pub fn new(canvas: WindowCanvas, camera: Camera) -> anyhow::Result<Self> {
-        let mut screen = canvas.texture_creator()
-            .create_texture_streaming(
-                Some(PixelFormat::ARGB8888),
-                PixelBuffer::WIDTH,
-                PixelBuffer::HEIGHT,
-            )?;
+        let mut screen = canvas.texture_creator().create_texture_streaming(
+            Some(PixelFormat::ARGB8888),
+            PixelBuffer::WIDTH,
+            PixelBuffer::HEIGHT,
+        )?;
 
         screen.set_scale_mode(ScaleMode::Nearest);
 
@@ -58,26 +57,41 @@ impl Renderer {
 
     pub fn blit_texture(&mut self, texture: &Texture, blit_desc: BlitDesc) {
         for y in 0..blit_desc.src.h {
-            let y_dst = if !blit_desc.blit_flags.contains(BlitFlags::FLIP_V) { y as i32 + blit_desc.dst.y - self.camera.y_offset() } else { blit_desc.dst.y + blit_desc.src.h as i32 - y as i32 - 1 - self.camera.y_offset() };
+            let y_dst = if !blit_desc.blit_flags.contains(BlitFlags::FLIP_V) {
+                y as i32 + blit_desc.dst.y - self.camera.y_offset()
+            } else {
+                blit_desc.dst.y + blit_desc.src.h as i32 - y as i32 - 1 - self.camera.y_offset()
+            };
 
             if y_dst < 0 || y_dst >= PixelBuffer::HEIGHT as i32 {
-                continue
+                continue;
             }
 
             for x in 0..blit_desc.src.w {
-                let x_dst = if !blit_desc.blit_flags.contains(BlitFlags::FLIP_H) { x as i32 + blit_desc.dst.x - self.camera.x_offset() } else { blit_desc.dst.x + blit_desc.src.w as i32 - x as i32 - 1 - self.camera.x_offset() };
+                let x_dst = if !blit_desc.blit_flags.contains(BlitFlags::FLIP_H) {
+                    x as i32 + blit_desc.dst.x - self.camera.x_offset()
+                } else {
+                    blit_desc.dst.x + blit_desc.src.w as i32 - x as i32 - 1 - self.camera.x_offset()
+                };
 
                 if x_dst < 0 || x_dst >= PixelBuffer::WIDTH as i32 {
-                    continue
+                    continue;
                 }
 
-                let pixel = texture.pixel_at((x + blit_desc.src.x) as usize, (y + blit_desc.src.y) as usize) as usize;
+                let pixel = texture.pixel_at(
+                    (x + blit_desc.src.x) as usize,
+                    (y + blit_desc.src.y) as usize,
+                ) as usize;
 
                 if pixel == Texture::TRANSPARENT_PIXEL as usize {
-                    continue
+                    continue;
                 }
 
-                self.pixel_buffer.set_pixel(x_dst as usize, y_dst as usize, self.palette[blit_desc.colors[pixel].unwrap()]);
+                self.pixel_buffer.set_pixel(
+                    x_dst as usize,
+                    y_dst as usize,
+                    self.palette[blit_desc.colors[pixel].unwrap()],
+                );
             }
         }
     }
@@ -89,9 +103,10 @@ impl Renderer {
     }
 
     pub fn splat(&mut self) -> anyhow::Result<()> {
-        self.screen.with_lock(None, |buffer: &mut [u8], _pitch: usize| {
-            buffer.copy_from_slice(self.pixel_buffer.bytes());
-        })?;
+        self.screen
+            .with_lock(None, |buffer: &mut [u8], _pitch: usize| {
+                buffer.copy_from_slice(self.pixel_buffer.bytes());
+            })?;
 
         self.canvas.copy(&self.screen, None, None)?;
 
@@ -99,7 +114,7 @@ impl Renderer {
 
         Ok(())
     }
-    
+
     pub fn camera_mut(&mut self) -> &mut Camera {
         &mut self.camera
     }

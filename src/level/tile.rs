@@ -61,10 +61,19 @@ impl Tile {
         }
     }
 
-    pub fn blit(&self, renderer: &mut Renderer, texture_registry: &TextureRegistry, x: i32, y: i32, neighbor_mask: NeighborMask, ticks: u32) {
+    pub fn blit(
+        &self,
+        renderer: &mut Renderer,
+        texture_registry: &TextureRegistry,
+        x: i32,
+        y: i32,
+        neighbor_mask: NeighborMask,
+        ticks: u32,
+    ) {
         match self.neighbor_check {
-            NeighborCheck::Zero => {
-                renderer.blit_texture(&texture_registry[self.texture_id], BlitDesc {
+            NeighborCheck::Zero => renderer.blit_texture(
+                &texture_registry[self.texture_id],
+                BlitDesc {
                     src: &Rect {
                         x: 0,
                         y: 0,
@@ -74,76 +83,313 @@ impl Tile {
                     dst: &Point { x, y },
                     colors: &self.colors,
                     blit_flags: &BlitFlags::empty(),
-                })
-            }
+                },
+            ),
             NeighborCheck::Four => {
-                if neighbor_mask.contains(NeighborMask::LEFT) && neighbor_mask.contains(NeighborMask::UP) {
+                if neighbor_mask.contains(NeighborMask::LEFT)
+                    && neighbor_mask.contains(NeighborMask::UP)
+                {
                     self.blit_center_random(renderer, texture_registry, x, y, ticks)
                 } else {
-                    renderer.blit_texture(&texture_registry[self.texture_id], BlitDesc {
-                        src: &Rect {
-                            x: neighbor_mask.contains(NeighborMask::LEFT) as u32 * Self::SUB_WIDTH as u32,
-                            y: neighbor_mask.contains(NeighborMask::UP) as u32 * Self::SUB_HEIGHT as u32,
-                            w: Self::SUB_WIDTH as u32,
-                            h: Self::SUB_HEIGHT as u32,
+                    renderer.blit_texture(
+                        &texture_registry[self.texture_id],
+                        BlitDesc {
+                            src: &Rect {
+                                x: neighbor_mask.contains(NeighborMask::LEFT) as u32
+                                    * Self::SUB_WIDTH as u32,
+                                y: neighbor_mask.contains(NeighborMask::UP) as u32
+                                    * Self::SUB_HEIGHT as u32,
+                                w: Self::SUB_WIDTH as u32,
+                                h: Self::SUB_HEIGHT as u32,
+                            },
+                            dst: &Point { x, y },
+                            colors: &self.colors,
+                            blit_flags: &BlitFlags::empty(),
                         },
-                        dst: &Point { x, y },
-                        colors: &self.colors,
-                        blit_flags: &BlitFlags::empty(),
-                    });
+                    );
                 }
 
-                if neighbor_mask.contains(NeighborMask::RIGHT) && neighbor_mask.contains(NeighborMask::UP) {
-                    self.blit_center_random(renderer, texture_registry, x + Self::SUB_WIDTH, y, ticks)
+                if neighbor_mask.contains(NeighborMask::RIGHT)
+                    && neighbor_mask.contains(NeighborMask::UP)
+                {
+                    self.blit_center_random(
+                        renderer,
+                        texture_registry,
+                        x + Self::SUB_WIDTH,
+                        y,
+                        ticks,
+                    )
                 } else {
-                    renderer.blit_texture(&texture_registry[self.texture_id], BlitDesc {
-                        src: &Rect {
-                            x: 16 - neighbor_mask.contains(NeighborMask::RIGHT) as u32 * Self::SUB_WIDTH as u32,
-                            y: neighbor_mask.contains(NeighborMask::UP) as u32 * Self::SUB_HEIGHT as u32,
-                            w: Self::SUB_WIDTH as u32,
-                            h: Self::SUB_HEIGHT as u32,
+                    renderer.blit_texture(
+                        &texture_registry[self.texture_id],
+                        BlitDesc {
+                            src: &Rect {
+                                x: 16
+                                    - neighbor_mask.contains(NeighborMask::RIGHT) as u32
+                                        * Self::SUB_WIDTH as u32,
+                                y: neighbor_mask.contains(NeighborMask::UP) as u32
+                                    * Self::SUB_HEIGHT as u32,
+                                w: Self::SUB_WIDTH as u32,
+                                h: Self::SUB_HEIGHT as u32,
+                            },
+                            dst: &Point {
+                                x: x + Self::SUB_WIDTH,
+                                y,
+                            },
+                            colors: &self.colors,
+                            blit_flags: &BlitFlags::empty(),
                         },
-                        dst: &Point { x: x + Self::SUB_WIDTH , y },
-                        colors: &self.colors,
-                        blit_flags: &BlitFlags::empty(),
-                    });
+                    );
                 }
 
-                if neighbor_mask.contains(NeighborMask::LEFT) && neighbor_mask.contains(NeighborMask::DOWN) {
-                    self.blit_center_random(renderer, texture_registry, x, y + Self::SUB_HEIGHT, ticks)
+                if neighbor_mask.contains(NeighborMask::LEFT)
+                    && neighbor_mask.contains(NeighborMask::DOWN)
+                {
+                    self.blit_center_random(
+                        renderer,
+                        texture_registry,
+                        x,
+                        y + Self::SUB_HEIGHT,
+                        ticks,
+                    )
                 } else {
-                    renderer.blit_texture(&texture_registry[self.texture_id], BlitDesc {
-                        src: &Rect {
-                            x: neighbor_mask.contains(NeighborMask::LEFT) as u32 * Self::SUB_WIDTH as u32,
-                            y: 16 - neighbor_mask.contains(NeighborMask::DOWN) as u32 * Self::SUB_HEIGHT as u32,
-                            w: Self::SUB_WIDTH as u32,
-                            h: Self::SUB_HEIGHT as u32,
+                    renderer.blit_texture(
+                        &texture_registry[self.texture_id],
+                        BlitDesc {
+                            src: &Rect {
+                                x: neighbor_mask.contains(NeighborMask::LEFT) as u32
+                                    * Self::SUB_WIDTH as u32,
+                                y: 16
+                                    - neighbor_mask.contains(NeighborMask::DOWN) as u32
+                                        * Self::SUB_HEIGHT as u32,
+                                w: Self::SUB_WIDTH as u32,
+                                h: Self::SUB_HEIGHT as u32,
+                            },
+                            dst: &Point {
+                                x,
+                                y: y + Self::SUB_HEIGHT,
+                            },
+                            colors: &self.colors,
+                            blit_flags: &BlitFlags::empty(),
                         },
-                        dst: &Point { x, y: y + Self::SUB_HEIGHT },
-                        colors: &self.colors,
-                        blit_flags: &BlitFlags::empty(),
-                    });
+                    );
                 }
 
-                if neighbor_mask.contains(NeighborMask::RIGHT) && neighbor_mask.contains(NeighborMask::DOWN) {
-                    self.blit_center_random(renderer, texture_registry, x + Self::SUB_WIDTH, y + Self::SUB_HEIGHT, ticks)
+                if neighbor_mask.contains(NeighborMask::RIGHT)
+                    && neighbor_mask.contains(NeighborMask::DOWN)
+                {
+                    self.blit_center_random(
+                        renderer,
+                        texture_registry,
+                        x + Self::SUB_WIDTH,
+                        y + Self::SUB_HEIGHT,
+                        ticks,
+                    )
                 } else {
-                    renderer.blit_texture(&texture_registry[self.texture_id], BlitDesc {
-                        src: &Rect {
-                            x: 16 - (neighbor_mask.contains(NeighborMask::RIGHT) as u32 * Self::SUB_WIDTH as u32),
-                            y: 16 - (neighbor_mask.contains(NeighborMask::DOWN) as u32 * Self::SUB_HEIGHT as u32),
-                            w: Self::SUB_WIDTH as u32,
-                            h: Self::SUB_HEIGHT as u32,
+                    renderer.blit_texture(
+                        &texture_registry[self.texture_id],
+                        BlitDesc {
+                            src: &Rect {
+                                x: 16
+                                    - (neighbor_mask.contains(NeighborMask::RIGHT) as u32
+                                        * Self::SUB_WIDTH as u32),
+                                y: 16
+                                    - (neighbor_mask.contains(NeighborMask::DOWN) as u32
+                                        * Self::SUB_HEIGHT as u32),
+                                w: Self::SUB_WIDTH as u32,
+                                h: Self::SUB_HEIGHT as u32,
+                            },
+                            dst: &Point {
+                                x: x + Self::SUB_WIDTH,
+                                y: y + Self::SUB_HEIGHT,
+                            },
+                            colors: &self.colors,
+                            blit_flags: &BlitFlags::empty(),
                         },
-                        dst: &Point { x: x + Self::SUB_WIDTH , y: y + Self::SUB_HEIGHT },
-                        colors: &self.colors,
-                        blit_flags: &BlitFlags::empty(),
-                    });
+                    );
                 }
-
             }
             NeighborCheck::Eight => {
+                if neighbor_mask.contains(NeighborMask::LEFT)
+                    && neighbor_mask.contains(NeighborMask::UP)
+                    && neighbor_mask.contains(NeighborMask::UP_LEFT)
+                {
+                    self.blit_center_random(renderer, texture_registry, x, y, ticks)
+                } else {
+                    renderer.blit_texture(
+                        &texture_registry[self.texture_id],
+                        BlitDesc {
+                            src: &Rect {
+                                x: if !neighbor_mask.contains(NeighborMask::UP_LEFT)
+                                    && neighbor_mask.contains(NeighborMask::LEFT)
+                                    && neighbor_mask.contains(NeighborMask::UP)
+                                {
+                                    24
+                                } else {
+                                    neighbor_mask.contains(NeighborMask::LEFT) as u32
+                                        * Self::SUB_WIDTH as u32
+                                },
+                                y: if !neighbor_mask.contains(NeighborMask::UP_LEFT)
+                                    && neighbor_mask.contains(NeighborMask::LEFT)
+                                    && neighbor_mask.contains(NeighborMask::UP)
+                                {
+                                    16
+                                } else {
+                                    neighbor_mask.contains(NeighborMask::UP) as u32
+                                        * Self::SUB_HEIGHT as u32
+                                },
+                                w: Self::SUB_WIDTH as u32,
+                                h: Self::SUB_HEIGHT as u32,
+                            },
+                            dst: &Point { x, y },
+                            colors: &self.colors,
+                            blit_flags: &BlitFlags::empty(),
+                        },
+                    );
+                }
 
+                if neighbor_mask.contains(NeighborMask::RIGHT)
+                    && neighbor_mask.contains(NeighborMask::UP)
+                    && neighbor_mask.contains(NeighborMask::UP_RIGHT)
+                {
+                    self.blit_center_random(
+                        renderer,
+                        texture_registry,
+                        x + Self::SUB_WIDTH,
+                        y,
+                        ticks,
+                    )
+                } else {
+                    renderer.blit_texture(
+                        &texture_registry[self.texture_id],
+                        BlitDesc {
+                            src: &Rect {
+                                x: if !neighbor_mask.contains(NeighborMask::UP_RIGHT)
+                                    && neighbor_mask.contains(NeighborMask::RIGHT)
+                                    && neighbor_mask.contains(NeighborMask::UP)
+                                {
+                                    32
+                                } else {
+                                    16
+                                        - neighbor_mask.contains(NeighborMask::RIGHT) as u32
+                                        * Self::SUB_WIDTH as u32
+                                },
+                                y: if !neighbor_mask.contains(NeighborMask::UP_RIGHT)
+                                    && neighbor_mask.contains(NeighborMask::RIGHT)
+                                    && neighbor_mask.contains(NeighborMask::UP)
+                                {
+                                    16
+                                } else {
+                                    neighbor_mask.contains(NeighborMask::UP) as u32
+                                        * Self::SUB_HEIGHT as u32
+                                },
+                                w: Self::SUB_WIDTH as u32,
+                                h: Self::SUB_HEIGHT as u32,
+                            },
+                            dst: &Point {
+                                x: x + Self::SUB_WIDTH,
+                                y,
+                            },
+                            colors: &self.colors,
+                            blit_flags: &BlitFlags::empty(),
+                        },
+                    );
+                }
+
+                if neighbor_mask.contains(NeighborMask::LEFT)
+                    && neighbor_mask.contains(NeighborMask::DOWN) && neighbor_mask.contains(NeighborMask::DOWN_LEFT)
+                {
+                    self.blit_center_random(
+                        renderer,
+                        texture_registry,
+                        x,
+                        y + Self::SUB_HEIGHT,
+                        ticks,
+                    )
+                } else {
+                    renderer.blit_texture(
+                        &texture_registry[self.texture_id],
+                        BlitDesc {
+                            src: &Rect {
+                                x: if !neighbor_mask.contains(NeighborMask::DOWN_LEFT)
+                                    && neighbor_mask.contains(NeighborMask::LEFT)
+                                    && neighbor_mask.contains(NeighborMask::DOWN)
+                                {
+                                    24
+                                } else {
+                                    neighbor_mask.contains(NeighborMask::LEFT) as u32
+                                        * Self::SUB_WIDTH as u32
+                                },
+                                y: if !neighbor_mask.contains(NeighborMask::DOWN_LEFT)
+                                    && neighbor_mask.contains(NeighborMask::LEFT)
+                                    && neighbor_mask.contains(NeighborMask::DOWN)
+                                {
+                                    24
+                                } else {
+                                    16
+                                        - neighbor_mask.contains(NeighborMask::DOWN) as u32
+                                        * Self::SUB_HEIGHT as u32
+                                },
+                                w: Self::SUB_WIDTH as u32,
+                                h: Self::SUB_HEIGHT as u32,
+                            },
+                            dst: &Point {
+                                x,
+                                y: y + Self::SUB_HEIGHT,
+                            },
+                            colors: &self.colors,
+                            blit_flags: &BlitFlags::empty(),
+                        },
+                    );
+                }
+
+                if neighbor_mask.contains(NeighborMask::RIGHT)
+                    && neighbor_mask.contains(NeighborMask::DOWN) && neighbor_mask.contains(NeighborMask::DOWN_RIGHT)
+                {
+                    self.blit_center_random(
+                        renderer,
+                        texture_registry,
+                        x + Self::SUB_WIDTH,
+                        y + Self::SUB_HEIGHT,
+                        ticks,
+                    )
+                } else {
+                    renderer.blit_texture(
+                        &texture_registry[self.texture_id],
+                        BlitDesc {
+                            src: &Rect {
+                                x: if !neighbor_mask.contains(NeighborMask::DOWN_RIGHT)
+                                    && neighbor_mask.contains(NeighborMask::RIGHT)
+                                    && neighbor_mask.contains(NeighborMask::DOWN)
+                                {
+                                    32
+                                } else {
+                                    16
+                                        - (neighbor_mask.contains(NeighborMask::RIGHT) as u32
+                                        * Self::SUB_WIDTH as u32)
+                                },
+                                y: if !neighbor_mask.contains(NeighborMask::DOWN_RIGHT)
+                                    && neighbor_mask.contains(NeighborMask::RIGHT)
+                                    && neighbor_mask.contains(NeighborMask::DOWN)
+                                {
+                                    24
+                                } else {
+                                    16
+                                        - neighbor_mask.contains(NeighborMask::DOWN) as u32
+                                        * Self::SUB_HEIGHT as u32
+                                },
+                                w: Self::SUB_WIDTH as u32,
+                                h: Self::SUB_HEIGHT as u32,
+                            },
+                            dst: &Point {
+                                x: x + Self::SUB_WIDTH,
+                                y: y + Self::SUB_HEIGHT,
+                            },
+                            colors: &self.colors,
+                            blit_flags: &BlitFlags::empty(),
+                        },
+                    );
+                }
             }
         }
     }
@@ -156,22 +402,42 @@ impl Tile {
         level.tile_at(x as usize, y as usize) == self.id
     }
 
-    fn blit_center_random(&self, renderer: &mut Renderer, texture_registry: &TextureRegistry, x: i32, y: i32, ticks: u32) {
-        let mut rng = StdRng::seed_from_u64(((x * y) + if self.liquid { ticks as i32 / 30 } else { 0 }) as u64);
+    fn blit_center_random(
+        &self,
+        renderer: &mut Renderer,
+        texture_registry: &TextureRegistry,
+        x: i32,
+        y: i32,
+        ticks: u32,
+    ) {
+        let mut rng = StdRng::seed_from_u64(
+            ((x * y) + if self.liquid { ticks as i32 / 30 } else { 0 }) as u64,
+        );
 
         let do_cool_texture = rng.random_range(0..=1) == 0;
 
-        renderer.blit_texture(&texture_registry[self.texture_id], BlitDesc {
-            src: &Rect {
-                x: if do_cool_texture { 8 } else { rng.random_range(0..=1) * Self::SUB_WIDTH as u32 + 24 },
-                y: if do_cool_texture { 8 } else { rng.random_range(0..=1) * Self::SUB_HEIGHT as u32 },
-                w: Self::SUB_WIDTH as u32,
-                h: Self::SUB_HEIGHT as u32,
+        renderer.blit_texture(
+            &texture_registry[self.texture_id],
+            BlitDesc {
+                src: &Rect {
+                    x: if do_cool_texture {
+                        8
+                    } else {
+                        rng.random_range(0..=1) * Self::SUB_WIDTH as u32 + 24
+                    },
+                    y: if do_cool_texture {
+                        8
+                    } else {
+                        rng.random_range(0..=1) * Self::SUB_HEIGHT as u32
+                    },
+                    w: Self::SUB_WIDTH as u32,
+                    h: Self::SUB_HEIGHT as u32,
+                },
+                dst: &Point { x, y },
+                colors: &self.colors,
+                blit_flags: &BlitFlags::empty(),
             },
-            dst: &Point { x, y },
-            colors: &self.colors,
-            blit_flags: &BlitFlags::empty(),
-        })
+        )
     }
 }
 

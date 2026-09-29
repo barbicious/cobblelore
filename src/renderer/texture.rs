@@ -24,7 +24,11 @@ impl Texture {
             }
         }
 
-        Ok(Self { pixels, width, height })
+        Ok(Self {
+            pixels,
+            width,
+            height,
+        })
     }
 
     pub fn width(&self) -> u32 {
