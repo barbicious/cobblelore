@@ -83,10 +83,10 @@ impl State {
             PositionComponent { x: 0, y: 0 },
             SpriteComponent {
                 colors: [
+                    Some(Palette::palettize(1, 1, 1)),
+                    Some(Palette::palettize(1, 4, 1)),
                     Some(Palette::palettize(3, 2, 1)),
-                    Some(Palette::palettize(1, 5, 1)),
-                    Some(Palette::palettize(2, 2, 2)),
-                    Some(Palette::palettize(1, 2, 3)),
+                    Some(Palette::palettize(4, 3, 2)),
                 ],
                 src: Rect {
                     x: 0,
@@ -189,6 +189,24 @@ impl State {
                 &self.tile_registry,
                 self.ticks,
             );
+
+            for (vel, pos, sprite) in &mut self.world.query::<(&VelocityComponent, &PositionComponent, &mut SpriteComponent)>() {
+                if vel.x < 0 {
+                    sprite.src.x = 32 + ((((pos.x / 16) & 2) != 0) as u32) * 16;
+                    sprite.flags.set(BlitFlags::FLIP_H, false)
+                } else if vel.x > 0 {
+                    sprite.src.x = 32 + ((((pos.x / 16) & 2) != 0) as u32) * 16;
+                    sprite.flags.set(BlitFlags::FLIP_H, true)
+                }
+
+                if vel.y < 0 {
+                    sprite.src.x = 16;
+                    sprite.flags.set(BlitFlags::FLIP_H, ((pos.y / 16) & 2) != 0)
+                } else if vel.y > 0 {
+                    sprite.src.x = 0;
+                    sprite.flags.set(BlitFlags::FLIP_H, ((pos.y / 16) & 2) != 0)
+                }
+            }
 
             for (pos, sprite) in &mut self.world.query::<(&PositionComponent, &SpriteComponent)>() {
                 self.renderer.blit_texture(
