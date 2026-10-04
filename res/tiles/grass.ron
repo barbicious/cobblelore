@@ -7,7 +7,6 @@
         Some((r: 2, g: 5, b: 2)),
     ),
     texture_name: "ground",
-    neighbor_check: Four,
-    liquid: false,
+    blit_type: Grass,
     solid: false,
 )

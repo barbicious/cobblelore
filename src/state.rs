@@ -63,7 +63,7 @@ impl State {
                     0,
                 ),
             )?,
-            level: Level::new(),
+            level: Level::new(&tile_registry),
             ticks: 0,
             keyboard,
             texture_registry,
@@ -112,8 +112,6 @@ impl State {
             tick_now = Instant::now();
             let delta_time = (tick_now - tick_last).as_secs_f32();
             tick_last = tick_now;
-
-            println!("{delta_time}");
 
             accumulator += delta_time;
 

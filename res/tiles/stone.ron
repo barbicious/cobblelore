@@ -7,7 +7,6 @@
         Some((r: 4, g: 4, b: 4)),
     ),
     texture_name: "rock",
-    neighbor_check: Eight,
-    liquid: false,
+    blit_type: Stone,
     solid: true,
 )

@@ -14,30 +14,36 @@ impl Level {
     pub const WIDTH: usize = 20;
     pub const HEIGHT: usize = 20;
 
-    pub fn new() -> Self {
-        let mut tiles = [0; Self::WIDTH * Self::HEIGHT];
+    pub fn new(tile_registry: &TileRegistry) -> Self {
+        let mut tiles = [tile_registry["cobblelore::grass"]; Self::WIDTH * Self::HEIGHT];
 
         for y in 3..7 {
             for x in 5..12 {
-                tiles[Self::idx(x, y)] = 1;
+                tiles[Self::idx(x, y)] = tile_registry["cobblelore::stone"];
             }
         }
 
         for y in 0..3 {
             for x in 10..15 {
-                tiles[Self::idx(x, y)] = 2;
+                tiles[Self::idx(x, y)] = tile_registry["cobblelore::stone"];
             }
         }
 
         for y in 0..6 {
             for x in 12..14 {
-                tiles[Self::idx(x, y)] = 2;
+                tiles[Self::idx(x, y)] = tile_registry["cobblelore::stone"];
             }
         }
 
         for y in 5..8 {
             for x in 8..17 {
-                tiles[Self::idx(x, y)] = 2;
+                tiles[Self::idx(x, y)] = tile_registry["cobblelore::water"];
+            }
+        }
+
+        for y in 3..6 {
+            for x in 3..6 {
+                tiles[Self::idx(x, y)] = tile_registry["cobblelore::oak_tree"];
             }
         }
 
@@ -53,9 +59,57 @@ impl Level {
     ) {
         for y in 0..Self::HEIGHT {
             for x in 0..Self::WIDTH {
-                let mut neighbor_mask = NeighborMask::empty();
-
                 let tile = &tile_registry[self.tiles[Self::idx(x, y)]];
+
+                if let Some(sub_tile) = tile.sub_tile() {
+                    let mut neighbor_mask = NeighborMask::empty();
+
+                    let tile = &tile_registry[tile_registry[sub_tile.as_str()]];
+
+                    if tile.connects(self, x as i32 - 1, y as i32 - 1, tile_registry) {
+                        neighbor_mask.set(NeighborMask::UP_LEFT, true)
+                    }
+
+                    if tile.connects(self, x as i32 + 1, y as i32 - 1, tile_registry) {
+                        neighbor_mask.set(NeighborMask::UP_RIGHT, true)
+                    }
+
+                    if tile.connects(self, x as i32 - 1, y as i32 + 1, tile_registry) {
+                        neighbor_mask.set(NeighborMask::DOWN_LEFT, true)
+                    }
+
+                    if tile.connects(self, x as i32 + 1, y as i32 + 1, tile_registry) {
+                        neighbor_mask.set(NeighborMask::DOWN_RIGHT, true)
+                    }
+
+                    if tile.connects(self, x as i32, y as i32 - 1, tile_registry) {
+                        neighbor_mask.set(NeighborMask::UP, true)
+                    }
+
+                    if tile.connects(self, x as i32, y as i32 + 1, tile_registry) {
+                        neighbor_mask.set(NeighborMask::DOWN, true)
+                    }
+
+                    if tile.connects(self, x as i32 - 1, y as i32, tile_registry) {
+                        neighbor_mask.set(NeighborMask::LEFT, true)
+                    }
+
+                    if tile.connects(self, x as i32 + 1, y as i32, tile_registry) {
+                        neighbor_mask.set(NeighborMask::RIGHT, true)
+                    }
+
+                    tile.blit(
+                        renderer,
+                        texture_registry,
+                        tile_registry,
+                        x as i32 * Tile::WIDTH,
+                        y as i32 * Tile::HEIGHT,
+                        &neighbor_mask,
+                        ticks,
+                    );
+                }
+                
+                let mut neighbor_mask = NeighborMask::empty();
 
                 if tile.connects(self, x as i32 - 1, y as i32 - 1, tile_registry) {
                     neighbor_mask.set(NeighborMask::UP_LEFT, true)
@@ -89,12 +143,13 @@ impl Level {
                     neighbor_mask.set(NeighborMask::RIGHT, true)
                 }
 
-                tile_registry[self.tiles[Self::idx(x, y)]].blit(
+                tile.blit(
                     renderer,
                     texture_registry,
+                    tile_registry,
                     x as i32 * Tile::WIDTH,
                     y as i32 * Tile::HEIGHT,
-                    neighbor_mask,
+                    &neighbor_mask,
                     ticks,
                 );
             }
